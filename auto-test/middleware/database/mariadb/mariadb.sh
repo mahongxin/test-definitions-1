@@ -69,7 +69,7 @@ function basic_function()
       ####@准备配置文件my.cnf
       pwd
       echo 1111111111111111111111
-      mv ./etc/my.cnf ./etc/my.cnf_bak
+     # mv ./etc/my.cnf ./etc/my.cnf_bak
       touch ./etc/my.cnf
       echo "[mysqld]" >> ./etc/my.cnf
       echo "basedir=/usr/local/mariadb-10.3.7" >> ./etc/my.cnf
@@ -88,7 +88,7 @@ function basic_function()
       print_info $? start-mariadb
       sleep 5
       ###@为root用户设置密码
-     ./bin/mysqladmin -S /usr/loacal/mariadb-10.3.7/mysql.sock -u root password 'root'
+     ./bin/mysqladmin -S /usr/local/mariadb-10.3.7/mysql.sock -u root password 'root'
       print_info $? set-root-password
       ###@创建用户 @创建/销毁testdb
       EXPECT=$(which expect)
