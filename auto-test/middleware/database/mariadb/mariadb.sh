@@ -37,8 +37,16 @@ function init_env()
             install_deps "${pkgs}"
             ;;
          debian)
+           pkgs="expect git unzip gcc g++ automake make libtool default-libmysqlclient-dev"
            apt-get install ufw -y
-           ufw enable
+           EXPECT << EOF
+	   set timeout 100
+	   spawn ufw enable
+	   expect "Command may"
+	   send "y\r"
+	   expect eof
+EOF
+           
            ;;
     esac
 
@@ -78,9 +86,10 @@ function basic_function()
       ###@启动mysqld进程
       nohup ./bin/mysqld_safe --defaults-file=/usr/local/mariadb-10.3.7/etc/my.cnf --ledir=/usr/local/mariadb-10.3.7/bin &
       print_info $? start-mariadb
+      sleep 5
       ###@为root用户设置密码
-    # ./bin/mysqladmin -S /usr/loacal/mariadb-10.3.7/mysql.sock -u root password 'root'
-    #  print_info $? set-root-password
+     ./bin/mysqladmin -S /usr/loacal/mariadb-10.3.7/mysql.sock -u root password 'root'
+      print_info $? set-root-password
       ###@创建用户 @创建/销毁testdb
       EXPECT=$(which expect)
       $EXPECT << EOF
@@ -146,8 +155,8 @@ function main()
    ######调用所有的函数
    init_env
    basic_function
-   performance_test
-   clean_env
+  # performance_test
+  # clean_env
 }
 
 main
