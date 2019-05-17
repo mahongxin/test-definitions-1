@@ -15,7 +15,7 @@
 
 ######初始化变量，新建一些文件######
 set -x
-exec 1>mylog 2>&1
+#exec 1>mylog 2>&1
 . ../../../../utils/sh-test-lib
 . ../../../../utils/sys_info.sh
 
@@ -119,6 +119,7 @@ function performance_test()
 {
   ####@压力测试
   pwd
+  ip_addr=`ip route | sed -r -n 's/.*dev (\w+).*src ([^ ]*) .*/\1 \2/p'|egrep -v "vir|br|vnet|lo|docker"|head -1|awk '{print $2}'`
   mv sysbench-0.5.zip /usr/local
   cd /usr/local/
   echo 22222222222222222222222
@@ -129,10 +130,10 @@ function performance_test()
   make
   make install
   cd /usr/local/sysbench-0.5
-  ./sysbench/sysbench --test=/usr/local/sysbench-0.5/sysbench/tests/db/parallel_prepare.lua --oltp-tables-count=250 --oltp-table-size=25000 --mysql-host=192.168.50.129 --mysql-port=2000 --mysql-db=testdb --mysql-user=test --mysql-password=test --num-threads=50 --max-requests=50 run
+  ./sysbench/sysbench --test=/usr/local/sysbench-0.5/sysbench/tests/db/parallel_prepare.lua --oltp-tables-count=250 --oltp-table-size=25000 --mysql-host=$ip_addr --mysql-port=2000 --mysql-db=testdb --mysql-user=test --mysql-password=test --num-threads=50 --max-requests=50 run
   print_info $? sysbench-mariadb-prepare
 
-  ./sysbench/sysbench --test=/usr/local/sysbench-0.5/sysbench/tests/db/oltp.lua --oltp-tables-count=250 --oltp-table-size=25000 --mysql-host=192.168.50.129 --mysql-port=2000 --mysql-db=testdb --mysql-user=test --mysql-password=test --oltp-read-only=on --oltp-point-selects=10 --oltp-simple-ranges=1 --oltp-sum-ranges=1 --oltp-order-ranges=1 --oltp-distinct-ranges=1 --oltp-range-size=10 --max-requests=0 --max-time=60 --report-interval=2 --forced-shutdown=1 --num-threads=100 run
+  ./sysbench/sysbench --test=/usr/local/sysbench-0.5/sysbench/tests/db/oltp.lua --oltp-tables-count=250 --oltp-table-size=25000 --mysql-host=$ip_addr --mysql-port=2000 --mysql-db=testdb --mysql-user=test --mysql-password=test --oltp-read-only=on --oltp-point-selects=10 --oltp-simple-ranges=1 --oltp-sum-ranges=1 --oltp-order-ranges=1 --oltp-distinct-ranges=1 --oltp-range-size=10 --max-requests=0 --max-time=60 --report-interval=2 --forced-shutdown=1 --num-threads=100 run
  print_info $? sysbench-mariadb-run
 
 }
