@@ -15,6 +15,7 @@
 
 ######初始化变量，新建一些文件######
 set -x
+exec 1>mylog 2>&1
 . ../../../../utils/sh-test-lib
 . ../../../../utils/sys_info.sh
 
@@ -38,6 +39,7 @@ function init_env()
             ;;
          debian)
            pkgs="expect git unzip gcc g++ automake make libtool default-libmysqlclient-dev"
+	   install_deps "${pkgs}"
            apt-get install ufw -y
            EXPECT << EOF
 	   set timeout 100
@@ -67,9 +69,6 @@ function basic_function()
          print_info 0 check-mariadb-version
       fi
       ####@准备配置文件my.cnf
-      pwd
-      echo 1111111111111111111111
-     # mv ./etc/my.cnf ./etc/my.cnf_bak
       touch ./etc/my.cnf
       echo "[mysqld]" >> ./etc/my.cnf
       echo "basedir=/usr/local/mariadb-10.3.7" >> ./etc/my.cnf
@@ -155,7 +154,7 @@ function main()
    ######调用所有的函数
    init_env
    basic_function
-  # performance_test
+   performance_test
   # clean_env
 }
 
